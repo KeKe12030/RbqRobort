@@ -1,6 +1,8 @@
 package cn.mcplugin.kqjcq;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -58,21 +60,22 @@ public class SickWebSite implements Runnable{
 	}
 
 	public static String getSickInfo() throws IOException{
-		getHtmlPageResponse();
 		String document = Jsoup.parse(staticHtml).text();//获取html文档
-		int a =document.indexOf("数据更新至");
-		int b = document.indexOf("国内");
-		String first = document.substring(a,b);
-		int c = document.indexOf("疫情 治愈");
-		String second = document.substring(b,c);
-		int d = document.indexOf("查看迁徙地图");
-		String thrid = document.substring(c,d);
-		return first+"\n"+second+"\n"+thrid;
+		Pattern p = Pattern.compile("\\d{4}\\.\\d{2}\\.\\d{2} \\d{2}:\\d{2}");
+		Matcher m = p.matcher(document);
+		String finalStr = null;
+		while(m.find()) {
+			finalStr = m.group();
+		}
+//		return "数据更新至："+finalStr;
+		int a = document.indexOf("数据更新至");
+		int b = document.indexOf("查看迁徙地图");
+		String f = document.substring(a,b);
+		String[] arr = f.split("\\s+");
+		f = arr[0]+"："+arr[1]+" "+arr[2]+"\n"+arr[4]+" "+arr[3]+" "+arr[6]+" "+arr[5]+"\n"+arr[8]+" "+arr[7]+" "+arr[10]+" "+arr[9];
+		return f;
 	}
 	public static String getArea(String area) throws IOException{
-		if(staticHtml == null) {
-			getHtmlPageResponse();
-		}
 		String document = Jsoup.parse(staticHtml).text();//获取html文档
 		int a = document.indexOf(area);
 		int b = document.indexOf("国外");
@@ -96,7 +99,7 @@ public class SickWebSite implements Runnable{
 
 	public static void main(String[] args) throws IOException {
 		SickWebSite sws = new SickWebSite();
-		System.out.println(getArea("浙江"));
+		System.out.println(getSickInfo());
 		//		Thread t = new Thread(sws);
 		//		t.start();
 	}
