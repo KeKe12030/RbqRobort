@@ -19,6 +19,7 @@ public class Main  extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 	static long time2 = 0L;
 	static long time3 = 0L;
 	static long time4 = 0L;
+	static long time5 = 0L;
 	static WHComeOn wh = new WHComeOn();
 	public static void main(String[] args) {
 		CQ = new CQDebug();
@@ -31,7 +32,12 @@ public class Main  extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 	public int startup() {
 		Thread t = new Thread(new SickWebSite());
 		t.start();
-		
+		try {
+			SickWebSite.getHtmlPageResponse();
+		} catch (IOException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
 		return 0;
 	}
 
@@ -76,6 +82,13 @@ public class Main  extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 				|| msg.contains("武汉") || msg.contains("病毒") 
 				|| msg.contains("感染")
 				|| msg.contains("疫情") || msg.contains("瘟疫"))) {
+			if(SickWebSite.staticHtml == null) {
+				try {
+					SickWebSite.getHtmlPageResponse();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 			if(System.currentTimeMillis() - time > 10000 || time==0) {
 				try {
 					time = System.currentTimeMillis();
@@ -94,11 +107,6 @@ public class Main  extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 
 		}else if(msg.contains("菜单") || msg.contains("点歌")) {
 			CQ.sendGroupMsg(fromGroup, "我说了我不是机器人！");
-		}else if(msg.contains("女装")) {
-			i++;
-			if(i%10 == 0) {
-				CQ.sendGroupMsg(fromGroup, "kk女装");
-			}
 		}else if(msg.equals("呵呵")) {
 			CQ.sendGroupMsg(fromGroup, "呵呵你马");
 		}else if(msg.contains("洗手") || msg.contains("搓手") || msg.contains("口罩") || msg.contains("助手")) {
@@ -145,6 +153,24 @@ public class Main  extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 				// TODO 自动生成的 catch 块
 				e.printStackTrace();
 			}
+		}else if(msg.contains("全国") && msg.contains("疫情")) {
+			try {
+				CQ.sendGroupMsg(fromGroup,SickWebSite.getSickInfo());
+			} catch (IOException e) {
+				// TODO 自动生成的 catch 块
+				e.printStackTrace();
+			}
+		}else if(msg.contains("数据") && msg.contains("更新")) {
+			if(System.currentTimeMillis() - time5 < 60000) {
+				CQ.sendGroupMsg(fromGroup,CC.at(fromQQ)+"一分钟只能更新一次疫情数据！\n"+"输入 武汉加油 为武汉点赞吧！");
+			}
+			try {
+				SickWebSite.getHtmlPageResponse();
+			} catch (IOException e) {
+				e.printStackTrace();
+				CQ.sendGroupMsg(fromGroup,CC.at(fromQQ)+"数据更新失败！\n"+"输入 武汉加油 为武汉点赞吧！");
+			}
+			time5 = System.currentTimeMillis();
 		}
 		return MSG_IGNORE;
 	}
