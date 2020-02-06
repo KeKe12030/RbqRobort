@@ -30,10 +30,11 @@ public class Main  extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 	}
 	@Override
 	public int startup() {
-		Thread t = new Thread(new SickWebSite());
-		t.start();
+		new Thread(new SickWebSite()).start();
+		new Thread(new SickWebSite()).start();
+		
 		try {
-			SickWebSite.getHtmlPageResponse();
+			SickWebSite.getHtmlPageResponse(SickWebSite.qurak);
 		} catch (IOException e) {
 			// TODO 自动生成的 catch 块
 			e.printStackTrace();
@@ -82,9 +83,10 @@ public class Main  extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 				|| msg.contains("武汉") || msg.contains("病毒") 
 				|| msg.contains("感染")
 				|| msg.contains("疫情") || msg.contains("瘟疫"))) {
-			if(SickWebSite.staticHtml == null) {
+			if(SickWebSite.qurakHtml == null || JsonInfo.jsonStr == null) {
 				try {
-					SickWebSite.getHtmlPageResponse();
+					SickWebSite.getHtmlPageResponse(SickWebSite.qurak);
+					JsonInfo.getDocument();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -92,11 +94,11 @@ public class Main  extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 			if(System.currentTimeMillis() - time > 10000 || time==0) {
 				try {
 					time = System.currentTimeMillis();
-					CQ.sendGroupMsg(fromGroup, "正在为您下载地图..."+"\n"+"这可能需要几秒钟的时间"+"\n"+"请耐心等待\n"+"输入 武汉加油 可以为武汉点赞哦！");
+					//CQ.sendGroupMsg(fromGroup, "正在为您下载地图..."+"\n"+"这可能需要几秒钟的时间"+"\n"+"请耐心等待\n"+"输入 武汉加油 可以为武汉点赞哦！");
 					CQImage c = new CQImage(SickWebSite.getImageUrl());
 					File f = new File("C:\\Users\\Administrator\\Desktop\\image\\map.jpg");
 					c.download(f);
-					CQ.sendGroupMsg(fromGroup, SickWebSite.getSickInfo()+CC.image(f));
+					CQ.sendGroupMsg(fromGroup, JsonInfo.getGlobalInfo()+CC.image(f));
 				} catch (IOException e) {
 					// TODO 自动生成的 catch 块
 					CQ.sendGroupMsg(fromGroup, e.toString());
@@ -142,30 +144,23 @@ public class Main  extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-				
+
 		}else if(msg.contains("疫情") && !(msg.contains("地图") || msg.contains("全国"))) {
 			String[] arr = msg.split("疫情");
-			try {
-				if(SickWebSite.staticHtml == null)
-					CQ.sendGroupMsg(fromGroup,"疫情信息初始化\n"+"这可能需要几秒钟的时间 \n"+"请您耐心等待\n"+"输入 武汉加油 可以为武汉点赞哦！");
-				CQ.sendGroupMsg(fromGroup,CC.at(fromQQ)+SickWebSite.getArea(arr[0]));
-			} catch (IOException e) {
-				// TODO 自动生成的 catch 块
-				e.printStackTrace();
-			}
+			if(SickWebSite.qurakHtml == null || JsonInfo.jsonStr == null)
+				CQ.sendGroupMsg(fromGroup,"疫情信息初始化\n"+"这可能需要几秒钟的时间 \n"+"请您耐心等待\n"+"输入 武汉加油 可以为武汉点赞哦！");
+			CQ.sendGroupMsg(fromGroup,CC.at(fromQQ)+SickWebSite.getArea(arr[0]));
+			// TODO 自动生成的 catch 块
 		}else if(msg.contains("全国") && msg.contains("疫情")) {
-			try {
-				CQ.sendGroupMsg(fromGroup,SickWebSite.getSickInfo());
-			} catch (IOException e) {
-				// TODO 自动生成的 catch 块
-				e.printStackTrace();
-			}
+			CQ.sendGroupMsg(fromGroup,JsonInfo.getGlobalInfo());
 		}else if(msg.contains("数据") && msg.contains("更新")) {
 			if(System.currentTimeMillis() - time5 < 60000) {
 				CQ.sendGroupMsg(fromGroup,CC.at(fromQQ)+"一分钟只能更新一次疫情数据！\n"+"输入 武汉加油 为武汉点赞吧！");
 			}
 			try {
-				SickWebSite.getHtmlPageResponse();
+				CQ.sendGroupMsg(fromGroup,CC.at(fromQQ)+"正在更新中！请稍后"+"输入 武汉加油 为武汉点赞吧！");
+				SickWebSite.getHtmlPageResponse(SickWebSite.qurak);
+				JsonInfo.getDocument();
 			} catch (IOException e) {
 				e.printStackTrace();
 				CQ.sendGroupMsg(fromGroup,CC.at(fromQQ)+"数据更新失败！\n"+"输入 武汉加油 为武汉点赞吧！");
