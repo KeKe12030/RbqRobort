@@ -134,12 +134,14 @@ public class JsonInfo implements Runnable{
 
 	@Override
 	public void run() {
-		getDocument();
-		try {
-			Thread.sleep(1000*600);
-		} catch (InterruptedException e) {
-			// TODO 自动生成的 catch 块
-			e.printStackTrace();
+		while(true) {
+			getDocument();
+			try {
+				Thread.sleep(1000*600);
+			} catch (InterruptedException e) {
+				// TODO 自动生成的 catch 块
+				e.printStackTrace();
+			}
 		}
 	}
 }

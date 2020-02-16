@@ -151,13 +151,15 @@ public class Main  extends JcqAppAbstract implements ICQVer, IMsg, IRequest {
 				e.printStackTrace();
 			}
 
-		}else if(msg.contains("疫情") && !(msg.contains("地图") || msg.contains("全国"))) {
-			String[] arr = msg.split("疫情");
-			if(JsonInfo.jsonStr == null || SickWebSite.zhihuHtml == null)
-				CQ.sendGroupMsg(fromGroup,"疫情信息初始化\n"+"这可能需要几秒钟的时间 \n"+"请您耐心等待\n"+"输入 武汉加油 可以为武汉点赞哦！");
-			CQ.sendGroupMsg(fromGroup,CC.at(fromQQ)+SickWebSite.getArea(arr[0]));
-			// TODO 自动生成的 catch 块
-		}else if(msg.contains("全国") && msg.contains("疫情")) {
+		}
+			//else if(msg.contains("疫情") && !(msg.contains("地图") || msg.contains("全国"))) {
+//			String[] arr = msg.split("疫情");
+//			if(JsonInfo.jsonStr == null || SickWebSite.zhihuHtml == null)
+//				CQ.sendGroupMsg(fromGroup,"疫情信息初始化\n"+"这可能需要几秒钟的时间 \n"+"请您耐心等待\n"+"输入 武汉加油 可以为武汉点赞哦！");
+//			CQ.sendGroupMsg(fromGroup,CC.at(fromQQ)+SickWebSite.getArea(arr[0]));
+//			// TODO 自动生成的 catch 块
+//		}
+			else if(msg.contains("全国") && msg.contains("疫情")) {
 			CQ.sendGroupMsg(fromGroup,JsonInfo.getGlobalInfo());
 		}else if(msg.contains("数据") && msg.contains("更新")) {
 			if(System.currentTimeMillis() - time5 < 60000) {
